@@ -3,66 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostrar Contenido de JSON</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
+    <title>Leer y mostrar data.json sin token</title>
+    <script>
+        const repoOwner = "nicocolque";
+        const repoName = "nicocolque.github.io";
+        const filePath = "data.json";
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+        // Función para obtener el contenido del archivo data.json
+        async function getData() {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/vnd.github.v3.raw", // Solicitar el contenido crudo
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener el archivo');
+                }
+
+                const content = await response.text(); // Obtener el contenido del archivo directamente como texto
+
+                if (content.trim() === "") {
+                    document.getElementById("data").innerText = "No hay contenido";
+                } else {
+                    document.getElementById("data").innerText = content;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById("data").innerText = "No se pudo obtener el archivo.";
+            }
         }
-        h1 {
-            color: #333;
+
+        // Función que obtiene el archivo cada 1 segundo para actualizaciones rápidas
+        function startRealTimeUpdates() {
+            setInterval(getData, 1000); // Actualizar cada 1 segundo (1000 ms)
         }
-        #content {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            width: 300px;
-            word-wrap: break-word;
-        }
-    </style>
+
+        window.onload = () => {
+            startRealTimeUpdates();  // Comienza las actualizaciones al cargar la página
+            getData(); // Llamar al método inmediatamente al cargar la página
+        };
+    </script>
 </head>
 <body>
-
-    <h1>Contenido desde data.json</h1>
-    <div id="content">Cargando...</div>
-
-    <script>
-        // Función para obtener la URL con un parámetro único para evitar caché
-        function getJsonUrl() {
-            const baseUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
-            const timestamp = new Date().getTime(); // Obtener el tiempo actual en milisegundos
-            return `${baseUrl}?t=${timestamp}`; // Agregar un parámetro de timestamp único
-        }
-
-        // Función para cargar el archivo JSON y mostrar el contenido
-        function loadJSON() {
-            fetch(getJsonUrl())  // Usar la URL con el parámetro de timestamp único
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("No se pudo cargar el archivo JSON.");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Mostrar el contenido del archivo JSON en el div
-                    const contentDiv = document.getElementById('content');
-                    contentDiv.textContent = data.content || 'No hay contenido disponible.';
-                })
-                .catch(error => {
-                    console.error('Error al cargar el JSON:', error);
-                    document.getElementById('content').textContent = 'Error al cargar los datos.';
-                });
-        }
-
-        // Cargar el contenido cuando se cargue la página
-        window.onload = loadJSON;
-
-        // Recargar el contenido cada 5 segundos
-        setInterval(loadJSON, 5000); // recargar cada 5000 ms (5 segundos)
-    </script>
-
+    <h1>Contenido del archivo data.json:</h1>
+    <pre id="data">Cargando...</pre>
 </body>
 </html>
