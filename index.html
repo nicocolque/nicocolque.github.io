@@ -3,54 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leer y mostrar data.json sin token</title>
+    <title>Mostrar JSON en Tiempo Real</title>
     <script>
-        const repoOwner = "nicocolque";
-        const repoName = "nicocolque.github.io";
-        const filePath = "data.json";
-        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-
-        // Función para obtener el contenido del archivo data.json
-        async function getData() {
-            try {
-                const response = await fetch(apiUrl, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/vnd.github.v3.raw", // Solicitar el contenido crudo
-                    }
+        // Función para cargar el archivo JSON
+        function cargarJSON() {
+            fetch('https://nicocolque.github.io/archivo.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Aquí puedes mostrar el contenido del JSON en la página
+                    document.getElementById("contenido").innerHTML = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error al cargar el archivo JSON:', error);
                 });
-
-                if (!response.ok) {
-                    throw new Error('Error al obtener el archivo');
-                }
-
-                const content = await response.text(); // Obtener el contenido del archivo directamente como texto
-
-                if (content.trim() === "") {
-                    document.getElementById("data").innerText = "No hay contenido";
-                } else {
-                    document.getElementById("data").innerText = content;
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById("data").innerText = "No se pudo obtener el archivo.";
-            }
         }
 
-        // Función que obtiene el archivo cada 1 segundo para actualizaciones rápidas
-        function startRealTimeUpdates() {
-            setInterval(getData, 1000); // Actualizar cada 1 segundo (1000 ms)
-        }
-
-        window.onload = () => {
-            startRealTimeUpdates();  // Comienza las actualizaciones al cargar la página
-            getData(); // Llamar al método inmediatamente al cargar la página
+        // Cargar el JSON cuando la página cargue
+        window.onload = function() {
+            cargarJSON();
+            // Actualizar cada 5 segundos (puedes ajustar el tiempo)
+            setInterval(cargarJSON, 5000);
         };
     </script>
 </head>
 <body>
-    <h1>Contenido del archivo data.json:</h1>
-    <pre id="data">Cargando...</pre>
+    <h1>Contenido del JSON</h1>
+    <pre id="contenido"></pre>
 </body>
 </html>
