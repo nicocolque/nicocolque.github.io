@@ -3,66 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostrar Contenido de JSON</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
+    <title>Gestionar data.json desde GitHub</title>
+    <script>
+        const token = "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"; // ¡No compartas tu token públicamente!
+
+        // URL del archivo data.json en tu repositorio de GitHub
+        const repoOwner = "nicocolque";
+        const repoName = "nicocolque.github.io";
+        const filePath = "data.json";
+
+        // URL de la API de GitHub para acceder a los contenidos del repositorio
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+        // Función para obtener el contenido del archivo data.json
+        async function getData() {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `token ${token}`,
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener el archivo');
+                }
+
+                const data = await response.json();
+                const content = atob(data.content); // Decodificar base64
+                document.getElementById("data").innerText = content;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('No se pudo obtener el archivo.');
+            }
         }
-        h1 {
-            color: #333;
+
+        // Función para eliminar el archivo data.json
+        async function deleteData() {
+            const response = await fetch(apiUrl, {
+                method: "GET",
+                headers: {
+                    "Authorization": `token ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                alert("Error al acceder al archivo para eliminarlo.");
+                return;
+            }
+
+            const data = await response.json();
+            const sha = data.sha; // Necesitamos el SHA del archivo para borrarlo
+
+            const deleteResponse = await fetch(apiUrl, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: "Eliminando data.json",
+                    sha: sha,
+                    branch: "main" // Cambia si tu rama es diferente
+                })
+            });
+
+            if (deleteResponse.ok) {
+                alert("Archivo eliminado con éxito");
+                document.getElementById("data").innerText = "";
+            } else {
+                alert("Error al eliminar el archivo.");
+            }
         }
-        #content {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            width: 300px;
-            word-wrap: break-word;
-        }
-    </style>
+
+        window.onload = () => {
+            getData();
+        };
+    </script>
 </head>
 <body>
-
-    <h1>Contenido desde data.json</h1>
-    <div id="content">Cargando...</div>
-
-    <script>
-        // Función para obtener la URL con un parámetro único para evitar caché
-        function getJsonUrl() {
-            const baseUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
-            const timestamp = new Date().getTime(); // Obtener el tiempo actual en milisegundos
-            return `${baseUrl}?t=${timestamp}`; // Agregar un parámetro de timestamp único
-        }
-
-        // Función para cargar el archivo JSON y mostrar el contenido
-        function loadJSON() {
-            fetch(getJsonUrl())  // Usar la URL con el parámetro de timestamp único
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("No se pudo cargar el archivo JSON.");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Mostrar el contenido del archivo JSON en el div
-                    const contentDiv = document.getElementById('content');
-                    contentDiv.textContent = data.content || 'No hay contenido disponible.';
-                })
-                .catch(error => {
-                    console.error('Error al cargar el JSON:', error);
-                    document.getElementById('content').textContent = 'Error al cargar los datos.';
-                });
-        }
-
-        // Cargar el contenido cuando se cargue la página
-        window.onload = loadJSON;
-
-        // Recargar el contenido cada 5 segundos
-        setInterval(loadJSON, 5000); // recargar cada 5000 ms (5 segundos)
-    </script>
-
+    <h1>Contenido del archivo data.json:</h1>
+    <pre id="data"></pre>
+    <button onclick="deleteData()">Eliminar archivo</button>
 </body>
 </html>
