@@ -30,12 +30,16 @@
     <div id="content">Cargando...</div>
 
     <script>
-        // URL del archivo data.json en tu repositorio de GitHub Pages
-        const jsonUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
+        // Función para obtener la URL con un parámetro único para evitar caché
+        function getJsonUrl() {
+            const baseUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
+            const timestamp = new Date().getTime(); // Obtener el tiempo actual en milisegundos
+            return `${baseUrl}?t=${timestamp}`; // Agregar un parámetro de timestamp único
+        }
 
         // Función para cargar el archivo JSON y mostrar el contenido
         function loadJSON() {
-            fetch(jsonUrl)
+            fetch(getJsonUrl())  // Usar la URL con el parámetro de timestamp único
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("No se pudo cargar el archivo JSON.");
