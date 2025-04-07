@@ -7,23 +7,22 @@
     <script>
         // Función para cargar el archivo JSON
         function cargarJSON() {
-    const url = `https://nicocolque.github.io/data.json?timestamp=${new Date().getTime()}`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("contenido").innerHTML = JSON.stringify(data, null, 2);
-        })
-        .catch(error => {
-            console.error('Error al cargar el archivo JSON:', error);
-        });
-}
+            fetch('https://nicocolque.github.io/archivo.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Aquí puedes mostrar el contenido del JSON en la página
+                    document.getElementById("contenido").innerHTML = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error al cargar el archivo JSON:', error);
+                });
+        }
 
         // Cargar el JSON cuando la página cargue
         window.onload = function() {
             cargarJSON();
             // Actualizar cada 5 segundos (puedes ajustar el tiempo)
-            setInterval(cargarJSON, 5000);
+            setInterval(cargarJSON, 1200);
         };
     </script>
 </head>
