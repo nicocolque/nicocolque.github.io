@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página con JSON Actualizado</title>
+    <title>Mostrar Contenido de JSON</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,6 +20,7 @@
             padding: 10px;
             margin-top: 20px;
             width: 300px;
+            word-wrap: break-word;
         }
     </style>
 </head>
@@ -32,7 +33,7 @@
         // URL del archivo data.json en tu repositorio de GitHub Pages
         const jsonUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
 
-        // Función para cargar el archivo JSON
+        // Función para cargar el archivo JSON y mostrar el contenido
         function loadJSON() {
             fetch(jsonUrl)
                 .then(response => {
@@ -55,8 +56,8 @@
         // Cargar el contenido cuando se cargue la página
         window.onload = loadJSON;
 
-        // También podemos hacer que se recargue automáticamente el contenido cada 30 segundos
-        setInterval(loadJSON, 30000); // recargar cada 30 segundos
+        // Recargar el contenido cada 5 segundos
+        setInterval(loadJSON, 5000); // recargar cada 5000 ms (5 segundos)
     </script>
 
 </body>
