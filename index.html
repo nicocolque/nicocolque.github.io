@@ -25,7 +25,44 @@
     </style>
 </head>
 <body>
-    <h1>Contenido del archivo data.json:</h1>
-    <pre id="data">Cargando...</pre>
+
+    <h1>Contenido desde data.json</h1>
+    <div id="content">Cargando...</div>
+
+    <script>
+        // Función para obtener la URL con un parámetro único para evitar caché
+        function getJsonUrl() {
+            const baseUrl = 'https://raw.githubusercontent.com/nicocolque/nicocolque.github.io/main/data.json';
+            const timestamp = new Date().getTime(); // Obtener el tiempo actual en milisegundos
+            return `${baseUrl}?t=${timestamp}`; // Agregar un parámetro de timestamp único
+        }
+
+        // Función para cargar el archivo JSON y mostrar el contenido
+        function loadJSON() {
+            fetch(getJsonUrl())  // Usar la URL con el parámetro de timestamp único
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("No se pudo cargar el archivo JSON.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Mostrar el contenido del archivo JSON en el div
+                    const contentDiv = document.getElementById('content');
+                    contentDiv.textContent = data.content || 'No hay contenido disponible.';
+                })
+                .catch(error => {
+                    console.error('Error al cargar el JSON:', error);
+                    document.getElementById('content').textContent = 'Error al cargar los datos.';
+                });
+        }
+
+        // Cargar el contenido cuando se cargue la página
+        window.onload = loadJSON;
+
+        // Recargar el contenido cada 5 segundos
+        setInterval(loadJSON, 5000); // recargar cada 5000 ms (5 segundos)
+    </script>
+
 </body>
 </html>
