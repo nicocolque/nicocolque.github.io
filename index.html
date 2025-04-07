@@ -3,87 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionar data.json desde GitHub</title>
-    <script>
-        const token = "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"; // ¡No compartas tu token públicamente!
-
-        // URL del archivo data.json en tu repositorio de GitHub
-        const repoOwner = "nicocolque";
-        const repoName = "nicocolque.github.io";
-        const filePath = "data.json";
-
-        // URL de la API de GitHub para acceder a los contenidos del repositorio
-        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-
-        // Función para obtener el contenido del archivo data.json
-        async function getData() {
-            try {
-                const response = await fetch(apiUrl, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `token ${token}`,
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al obtener el archivo');
-                }
-
-                const data = await response.json();
-                const content = atob(data.content); // Decodificar base64
-                document.getElementById("data").innerText = content;
-            } catch (error) {
-                console.error('Error:', error);
-                alert('No se pudo obtener el archivo.');
-            }
+    <title>Mostrar Contenido de JSON</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
         }
-
-        // Función para eliminar el archivo data.json
-        async function deleteData() {
-            const response = await fetch(apiUrl, {
-                method: "GET",
-                headers: {
-                    "Authorization": `token ${token}`,
-                }
-            });
-
-            if (!response.ok) {
-                alert("Error al acceder al archivo para eliminarlo.");
-                return;
-            }
-
-            const data = await response.json();
-            const sha = data.sha; // Necesitamos el SHA del archivo para borrarlo
-
-            const deleteResponse = await fetch(apiUrl, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `token ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "Eliminando data.json",
-                    sha: sha,
-                    branch: "main" // Cambia si tu rama es diferente
-                })
-            });
-
-            if (deleteResponse.ok) {
-                alert("Archivo eliminado con éxito");
-                document.getElementById("data").innerText = "";
-            } else {
-                alert("Error al eliminar el archivo.");
-            }
+        h1 {
+            color: #333;
         }
-
-        window.onload = () => {
-            getData();
-        };
-    </script>
+        #content {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            width: 300px;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
     <h1>Contenido del archivo data.json:</h1>
-    <pre id="data"></pre>
-    <button onclick="deleteData()">Eliminar archivo</button>
+    <pre id="data">Cargando...</pre>
 </body>
 </html>
