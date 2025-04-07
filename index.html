@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostrar JSON en Tiempo Real</title>
+    <title>Mostrar JSON con async/await</title>
     <script>
-        // Función para cargar el archivo JSON
-        function cargarJSON() {
-            fetch('https://nicocolque.github.io/archivo.json')
-                .then(response => response.json())
-                .then(data => {
-                    // Aquí puedes mostrar el contenido del JSON en la página
-                    document.getElementById("contenido").innerHTML = JSON.stringify(data, null, 2);
-                })
-                .catch(error => {
-                    console.error('Error al cargar el archivo JSON:', error);
-                });
+        // Función para cargar el archivo JSON de manera asincrónica
+        async function cargarJSON() {
+            const url = `https://nicocolque.github.io/data.json?timestamp=${new Date().getTime()}`;
+            
+            try {
+                // Esperar la respuesta de la solicitud fetch
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // Mostrar el contenido del JSON
+                document.getElementById("contenido").innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error al cargar el archivo JSON:', error);
+            }
         }
 
-        // Cargar el JSON cuando la página cargue
-        window.onload = function() {
+        // Función para actualizar periódicamente
+        function iniciarActualizacion() {
+            // Llamamos a la función cargarJSON una vez al inicio
             cargarJSON();
-            // Actualizar cada 5 segundos (puedes ajustar el tiempo)
-            setInterval(cargarJSON, 1200);
-        };
+
+            // Luego, usamos setInterval para ejecutar cargarJSON cada 5 segundos (5000 ms)
+            setInterval(async () => {
+                await cargarJSON(); // Espera a que termine el fetch antes de ejecutar otra vez
+            }, 5000);
+        }
+
+        // Iniciar el proceso de actualización al cargar la página
+        window.onload = iniciarActualizacion;
     </script>
 </head>
 <body>
